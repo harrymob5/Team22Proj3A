@@ -1,7 +1,7 @@
 // ****************************************************************
-// * TEAM50: T. LUM and R. MARTIN
+// * TEAM22: H. Mobley, J. Tingey
 // * Helper file for SSD_Array.c
-// * CPEG222, 9/19/25
+// * CPEG222, 10/17/25
 // ****************************************************************
 #include "SSD_Array.h"
 #include "stm32f4xx.h"
