@@ -8,7 +8,7 @@
 #include <stdio.h>
 
 #define trig_pin   4      // PA4  - Trigger
-#define echo_pin   10     // PB10 - Echo 
+#define echo_pin   0     // PB0 - Echo (TIM3_CH3)
 #define trig_port  GPIOA
 #define echo_port  GPIOB
 
@@ -27,9 +27,11 @@ volatile uint8_t  current_digit = 0;     // SSD multiplex index
 
 void GPIO_Init(void);
 void TIM2_Init(void);
+void TIM3_Init(void);
 void USART2_Init(void);
 void SysTick_Handler(void);
 void TIM2_IRQHandler(void);
+void TIM3_IRQHandler(void);
 void EXTI15_10_IRQHandler(void);
 
 void trigger_pulse(void);
