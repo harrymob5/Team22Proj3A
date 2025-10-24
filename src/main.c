@@ -35,7 +35,7 @@ void trigger_pulse(void);
 void delay_us(uint32_t us);
 void delay_ms(uint32_t ms);
 void send_string(const char *s);
-static inline uint32_t angle_to_pulse_us(int angle_deg);
+static inline uint32_t angle_to_pulse_us(int angle_deg); 
 
 int main(void){
     SystemCoreClockUpdate();
@@ -52,9 +52,14 @@ int main(void){
     const int angle_max = 45;
     int angle = angle_min, dir = 1;
 
+    // --- Set initial servo position
+    TIM3->CCR1 = angle_to_pulse_us(angle); 
+
+
     while (1)
     {
-        // TODO: set servo position using angle_to_pulse_us(angle)
+        // set servo position using angle_to_pulse_us(angle)
+        TIM3->CCR1 = angle_to_pulse_us(angle);
         delay_ms(250); // give servo time to move
 
         edge_state = 0;
@@ -63,28 +68,27 @@ int main(void){
 
         while (pulse_width_us == 0) delay_us(1);
 
-    float raw_cm = (pulse_width_us > 0) ? ((float)pulse_width_us / 58.0f) : 0.0f;
+        float raw_cm = (pulse_width_us > 0) ? ((float)pulse_width_us / 58.0f) : 0.0f;
 
-    float display_val = display_inch ? (raw_cm / 2.54f) : raw_cm;
-    if (display_val > 99.99f) display_val = 99.99f;
+        float display_val = display_inch ? (raw_cm / 2.54f) : raw_cm;
+        if (display_val > 99.99f) display_val = 99.99f;
 
-    if (display_inch) {
-        last_distance_cm = display_val * 2.54f; 
-    } else {
-        last_distance_cm = display_val;         
-    }
+        if (display_inch) {
+            last_distance_cm = display_val * 2.54f; 
+        } else {
+            last_distance_cm = display_val;         
+        }
 
-    char out[96];
-    if (display_inch) {
-        sprintf(out, "Angle: %d deg, Pulse: %lu us, Range: %.2f in\r\n",
-                angle, (unsigned long)pulse_width_us, display_val);
-    } else {
-        sprintf(out, "Angle: %d deg, Pulse: %lu us, Range: %.2f cm\r\n",
-                angle, (unsigned long)pulse_width_us, display_val);
-    }
-    send_string(out);
 
-        // TODO: implement servo sweep logic
+        //servo sweep logic
+        angle += dir * step_deg;
+        if (angle > angle_max) {
+            angle = angle_max;
+            dir = -1;
+        } else if (angle < angle_min) {
+            angle = angle_min;
+            dir = 1;
+        }
     }
 }
 
@@ -221,4 +225,11 @@ void delay_us(uint32_t us){
 
 void delay_ms(uint32_t ms){
     while (ms--) delay_us(1000);
+}
+
+static inline uint32_t angle_to_pulse_us(int angle_deg) {
+    if (angle_deg > 45) angle_deg = 45;
+    if (angle_deg < -45) angle_deg = -45;
+    float pw = 1500.0f - (500.0f * ((float)angle_deg / 45.0f));
+    return (uint32_t)(pw + 0.5f);
 }
