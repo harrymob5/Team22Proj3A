@@ -79,6 +79,15 @@ int main(void){
             last_distance_cm = display_val;         
         }
 
+        char out[96];
+        if (display_inch) {
+            sprintf(out, "Angle: %d deg, Pulse: %lu us, Range: %.2f in\r\n",
+                    angle, pulse_width_us, display_val);
+        } else {
+            sprintf(out, "Angle: %d deg, Pulse: %lu us, Range: %.2f cm\r\n",
+                    angle, pulse_width_us, display_val);
+        }
+        send_string(out);
 
         //servo sweep logic
         angle += dir * step_deg;
